@@ -1,8 +1,9 @@
 package br.com.alura.forum.controller
 
 import br.com.alura.forum.model.Topico
-import br.com.alura.forum.service.request.TopicoView
 import br.com.alura.forum.service.TopicoService
+import br.com.alura.forum.service.request.AtualizacaoTopicoView
+import br.com.alura.forum.service.request.TopicoView
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
@@ -27,5 +28,16 @@ class TopicoController(private val service: TopicoService) {
         val id = this.service.cadastrar(topicoView)
         val uriResultante = URI.create("localhost:8080/topico/$id")
         return ResponseEntity.created(uriResultante).build()
+    }
+
+    @PutMapping
+    fun atualizar(@RequestBody @Valid atualizarTopicoView: AtualizacaoTopicoView) {
+        this.service.atualizar(atualizarTopicoView)
+        ResponseEntity.ok()
+    }
+
+    @DeleteMapping("/{id}")
+    fun remover(@PathVariable id: Long) {
+        this.service.remover(id)
     }
 }

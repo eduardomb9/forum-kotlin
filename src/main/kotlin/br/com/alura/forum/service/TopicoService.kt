@@ -5,15 +5,19 @@ import br.com.alura.forum.model.Curso
 import br.com.alura.forum.model.StatusTopico
 import br.com.alura.forum.model.Topico
 import br.com.alura.forum.model.Usuario
+import br.com.alura.forum.service.request.AtualizacaoTopicoView
 import br.com.alura.forum.service.request.TopicoView
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class TopicoService(
-    private val topicoViewMapper: TopicoViewMapper
+    private val topicoViewMapper: TopicoViewMapper,
 ) {
 
     private var topicos = mutableListOf<Topico>()
+    private val LOG = LoggerFactory.getLogger(this::class.java)
 
     init {
         topicos.add(
@@ -82,8 +86,26 @@ class TopicoService(
 
     fun cadastrar(topicoView: TopicoView): Long? {
         return topicoViewMapper.map(topicoView)
-        .apply { id = topicos.last().id?.plus(1) }
-        .also { topicos.add(it) }.id
+            .apply { id = topicos.last().id?.plus(1) }
+            .also { topicos.add(it) }.id
+    }
+
+    fun atualizar(atualizarTopicoView: AtualizacaoTopicoView) {
+        topicos
+            .first { it.id == atualizarTopicoView.id }
+            .apply {
+                titulo = atualizarTopicoView.titulo
+                mensagem = atualizarTopicoView.mensagem
+                dataCriacao = LocalDateTime.now()
+            }
+    }
+
+    fun remover(id: Long) {
+        topicos
+            .first {
+                it.id == id
+            }.let { topicos.remove(it) }
+        LOG.info("Topico $id removido")
     }
 
 
