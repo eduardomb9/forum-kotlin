@@ -1,19 +1,18 @@
 package br.com.alura.forum.mapper
 
-import br.com.alura.forum.model.Curso
 import br.com.alura.forum.model.Topico
-import br.com.alura.forum.model.Usuario
-import br.com.alura.forum.service.request.TopicoView
+import br.com.alura.forum.service.response.TopicoView
 import org.springframework.stereotype.Component
 
 @Component
-class TopicoViewMapper : Mapper<TopicoView, Topico> {
-    override fun map(t: TopicoView): Topico {
-        return Topico(
+class TopicoViewMapper : Mapper<Topico, TopicoView> {
+    override fun map(t: Topico): TopicoView {
+        return TopicoView(
+            id = t.id,
             titulo = t.titulo,
             mensagem = t.mensagem,
-            curso = Curso(id = t.idCurso, nome = "", categoria = ""),
-            autor = Usuario(id = t.idAutor, nome = "", email = "")
+            dataCriacao = t.dataCriacao,
+            status = t.status
         )
     }
 

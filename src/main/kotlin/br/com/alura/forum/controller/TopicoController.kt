@@ -2,8 +2,8 @@ package br.com.alura.forum.controller
 
 import br.com.alura.forum.model.Topico
 import br.com.alura.forum.service.TopicoService
-import br.com.alura.forum.service.request.AtualizacaoTopicoView
-import br.com.alura.forum.service.request.TopicoView
+import br.com.alura.forum.service.request.AtualizacaoTopicoForm
+import br.com.alura.forum.service.request.TopicoForm
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -26,16 +26,16 @@ class TopicoController(private val service: TopicoService) {
 
     @PostMapping
     fun cadastrar(
-        @RequestBody @Valid topicoView: TopicoView,
+        @RequestBody @Valid topicoView: TopicoForm,
         uriComponentsBuilder: UriComponentsBuilder
     ): ResponseEntity<Long> {
-        val id = this.service.cadastrar(topicoView)
-        val uriResultante = uriComponentsBuilder.path("/topico/$id").build().toUri()
-        return ResponseEntity.created(uriResultante).body(id)
+        val topico = this.service.cadastrar(topicoView)
+        val uriResultante = uriComponentsBuilder.path("/topico/${topico.id}").build().toUri()
+        return ResponseEntity.created(uriResultante).body(topico.id)
     }
 
     @PutMapping
-    fun atualizar(@RequestBody @Valid atualizarTopicoView: AtualizacaoTopicoView) {
+    fun atualizar(@RequestBody @Valid atualizarTopicoView: AtualizacaoTopicoForm) {
         this.service.atualizar(atualizarTopicoView)
         ResponseEntity.ok()
     }

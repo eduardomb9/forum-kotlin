@@ -4,7 +4,7 @@ import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
-data class TopicoView(
+data class TopicoForm(
     @field:NotEmpty @field:Size(min = 5, max = 30)
     val titulo: String,
 

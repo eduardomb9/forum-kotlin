@@ -1,19 +1,27 @@
 package br.com.alura.forum.service
 
+import br.com.alura.forum.exception.NotFoundException
+import br.com.alura.forum.mapper.TopicoFormMapper
 import br.com.alura.forum.mapper.TopicoViewMapper
 import br.com.alura.forum.model.Curso
 import br.com.alura.forum.model.StatusTopico
 import br.com.alura.forum.model.Topico
 import br.com.alura.forum.model.Usuario
-import br.com.alura.forum.service.request.AtualizacaoTopicoView
-import br.com.alura.forum.service.request.TopicoView
+import br.com.alura.forum.repository.TopicoRepository
+import br.com.alura.forum.service.request.AtualizacaoTopicoForm
+import br.com.alura.forum.service.request.TopicoForm
+import br.com.alura.forum.service.response.TopicoView
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TopicoService(
+    private val topicoFormMapper: TopicoFormMapper,
     private val topicoViewMapper: TopicoViewMapper,
+    private val repository: TopicoRepository,
+    private val cursoService: CursoService,
+    private val usuarioService: UsuarioService
 ) {
 
     private var topicos = mutableListOf<Topico>()
@@ -77,36 +85,30 @@ class TopicoService(
     }
 
     fun listar(): List<Topico> {
-        return topicos.toList()
+        return repository.findAll()
     }
 
     fun buscarPorId(id: Long): Topico {
-        return topicos.first { it.id == id }
+        return repository.findById(id).orElseThrow { NotFoundException("Nao encontrado!") }
     }
 
-    fun cadastrar(topicoView: TopicoView): Long? {
-        return topicoViewMapper.map(topicoView)
-            .apply { id = topicos.last().id?.plus(1) }
-            .also { topicos.add(it) }.id
+    fun cadastrar(topicoForm: TopicoForm): TopicoView {
+        val topico = topicoFormMapper.map(topicoForm)
+        repository.save(topico)
+        return topicoViewMapper.map(topico)
     }
 
-    fun atualizar(atualizarTopicoView: AtualizacaoTopicoView) {
-        topicos
-            .first { it.id == atualizarTopicoView.id }
-            .apply {
-                titulo = atualizarTopicoView.titulo
-                mensagem = atualizarTopicoView.mensagem
-                dataCriacao = LocalDateTime.now()
-            }
+    @Transactional
+    fun atualizar(form: AtualizacaoTopicoForm): TopicoView {
+        val topico = repository.findById(form.id).orElseThrow { NotFoundException("Nao encontrado!") }
+        topico.titulo = form.titulo
+        topico.mensagem = form.mensagem
+        return topicoViewMapper.map(topico)
     }
 
     fun remover(id: Long) {
-        topicos
-            .first {
-                it.id == id
-            }.let { topicos.remove(it) }
+        repository.deleteById(id)
         LOG.info("Topico $id removido")
     }
-
 
 }
