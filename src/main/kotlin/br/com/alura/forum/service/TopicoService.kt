@@ -10,6 +10,7 @@ import br.com.alura.forum.model.Usuario
 import br.com.alura.forum.repository.TopicoRepository
 import br.com.alura.forum.service.request.AtualizacaoTopicoForm
 import br.com.alura.forum.service.request.TopicoForm
+import br.com.alura.forum.service.response.RelatorioDto
 import br.com.alura.forum.service.response.TopicoView
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
@@ -116,6 +117,10 @@ class TopicoService(
     fun remover(id: Long) {
         repository.deleteById(id)
         LOG.info("Topico $id removido")
+    }
+
+    fun obterRelatorio(): List<RelatorioDto> {
+        return repository.obterRelatorio()
     }
 
 }

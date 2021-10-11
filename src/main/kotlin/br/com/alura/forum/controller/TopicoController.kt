@@ -4,6 +4,7 @@ import br.com.alura.forum.model.Topico
 import br.com.alura.forum.service.TopicoService
 import br.com.alura.forum.service.request.AtualizacaoTopicoForm
 import br.com.alura.forum.service.request.TopicoForm
+import br.com.alura.forum.service.response.RelatorioDto
 import br.com.alura.forum.service.response.TopicoView
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -63,4 +64,10 @@ class TopicoController(private val service: TopicoService) {
     fun remover(@PathVariable id: Long) {
         this.service.remover(id)
     }
+
+    @GetMapping("/relatorio")
+    fun relatorio(): ResponseEntity<List<RelatorioDto>> {
+        return ResponseEntity.ok(service.obterRelatorio())
+    }
+
 }
