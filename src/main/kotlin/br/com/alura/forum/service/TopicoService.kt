@@ -12,6 +12,8 @@ import br.com.alura.forum.service.request.AtualizacaoTopicoForm
 import br.com.alura.forum.service.request.TopicoForm
 import br.com.alura.forum.service.response.TopicoView
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -84,13 +86,13 @@ class TopicoService(
         )
     }
 
-    fun listar(nomeCurso: String?): List<Topico> {
+    fun listar(nomeCurso: String?, pagina: Pageable): Page<TopicoView> {
         val topicos = if (nomeCurso == null) {
-            repository.findAll()
+            repository.findAll(pagina)
         } else {
-            repository.findByCursoNome(nomeCurso)
+            repository.findByCursoNome(nomeCurso, pagina)
         }
-        return topicos
+        return topicos.map { topicoViewMapper.map(it) }
     }
 
     fun buscarPorId(id: Long): Topico {
