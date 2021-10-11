@@ -84,8 +84,13 @@ class TopicoService(
         )
     }
 
-    fun listar(): List<Topico> {
-        return repository.findAll()
+    fun listar(nomeCurso: String?): List<Topico> {
+        val topicos = if (nomeCurso == null) {
+            repository.findAll()
+        } else {
+            repository.findByCursoNome(nomeCurso)
+        }
+        return topicos
     }
 
     fun buscarPorId(id: Long): Topico {
