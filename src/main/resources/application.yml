@@ -14,3 +14,8 @@ spring:
     console:
       enable:
         true
+jwt:
+  secret:
+    minhaSenha
+  expiration:
+    60000
