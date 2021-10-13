@@ -13,7 +13,7 @@ class TopicoFormMapper : Mapper<TopicoForm, Topico> {
             titulo = t.titulo,
             mensagem = t.mensagem,
             curso = Curso(id = t.idCurso, nome = "", categoria = ""),
-            autor = Usuario(id = t.idAutor, nome = "", email = "")
+            autor = Usuario(id = t.idAutor, nome = "", email = "", senha="")
         )
     }
 
