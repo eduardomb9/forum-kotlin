@@ -17,7 +17,16 @@ class SecurityConfig (
         ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
-        http?.authorizeRequests()?.anyRequest()?.authenticated()?.and()?.formLogin()?.disable()?.httpBasic()
+        http?.
+        authorizeRequests()?.
+            antMatchers("/topico")?.hasAuthority("LEITURA-ESCRITA")?.
+            antMatchers("/h2-console/**")?.permitAll()?.
+            anyRequest()?.
+            authenticated()?.
+            and()?.
+            formLogin()?.
+            disable()?.
+            httpBasic()
         http?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
 
