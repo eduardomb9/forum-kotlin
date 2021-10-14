@@ -23,9 +23,11 @@ class SecurityConfig(
 
     override fun configure(http: HttpSecurity?) {
         http?.csrf()?.disable()?.authorizeRequests()?.
-//            antMatchers("/h2-console/**")?.permitAll()?.
+        antMatchers("/h2-console/**")?.permitAll()?.
+        antMatchers("/topico")?.hasAuthority("LEITURA-ESCRITA")?.
         antMatchers(HttpMethod.POST, "/login")?.permitAll()?.
-        anyRequest()?.authenticated()?.and()
+        anyRequest()?.authenticated()?.
+        and()
         http?.addFilterBefore(
             JWTLoginFilter(authManager = authenticationManager(), jwtUtil = jwtUtil),
             UsernamePasswordAuthenticationFilter().javaClass

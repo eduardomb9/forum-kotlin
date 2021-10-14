@@ -1,5 +1,7 @@
 package br.com.alura.forum.config
 
+import br.com.alura.forum.model.Role
+import br.com.alura.forum.service.UsuarioService
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
@@ -9,7 +11,9 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class JwtUtil {
+class JwtUtil(
+    private val usuarioService: UsuarioService
+) {
 
     @Value("\${jwt.secret}")
     private lateinit var secret: String
@@ -17,9 +21,10 @@ class JwtUtil {
     @Value("\${jwt.expiration}")
     private lateinit var expiration: String
 
-    fun generateToken(username: String): String? {
+    fun generateToken(username: String, authorities: List<Role>): String? {
         return Jwts.builder()
             .setSubject(username)
+            .claim("role", authorities)
             .setExpiration(Date(System.currentTimeMillis() + expiration.toLong()))
             .signWith(SignatureAlgorithm.HS512, secret.toByteArray())
             .compact()
@@ -36,8 +41,9 @@ class JwtUtil {
     }
 
     fun getAuthentication(detail: String?): Authentication {
-        val user = Jwts.parser().setSigningKey(secret.toByteArray()).parseClaimsJws(detail).body.subject
-        return UsernamePasswordAuthenticationToken(user, null, null)
+        val username = Jwts.parser().setSigningKey(secret.toByteArray()).parseClaimsJws(detail).body.subject
+        val user = usuarioService.loadUserByUsername(username)
+        return UsernamePasswordAuthenticationToken(user.username, null, user.authorities)
     }
 
 }
