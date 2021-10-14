@@ -1,8 +1,10 @@
 package br.com.alura.forum.config
 
+import br.com.alura.forum.security.JWTAuthenticationFilter
 import br.com.alura.forum.security.JWTLoginFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -14,26 +16,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig (
+class SecurityConfig(
     private val userDetailService: UserDetailsService,
     private val jwtUtil: JwtUtil
-        ) : WebSecurityConfigurerAdapter() {
+) : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
-        http?.
-        authorizeRequests()?.
-//            antMatchers("/topico")?.hasAuthority("LEITURA-ESCRITA")?.
+        http?.csrf()?.disable()?.authorizeRequests()?.
 //            antMatchers("/h2-console/**")?.permitAll()?.
-            antMatchers("/login")?.permitAll()?.
-            anyRequest()?.
-            authenticated()?.
-            and()
-            http?.addFilterBefore(JWTLoginFilter(authManager = authenticationManager(), jwtUtil = jwtUtil), UsernamePasswordAuthenticationFilter().javaClass)
-            http?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)?.
-            and()?.
-            formLogin()?.
-            disable()?.
-            httpBasic()
+        antMatchers(HttpMethod.POST, "/login")?.permitAll()?.
+        anyRequest()?.authenticated()?.and()
+        http?.addFilterBefore(
+            JWTLoginFilter(authManager = authenticationManager(), jwtUtil = jwtUtil),
+            UsernamePasswordAuthenticationFilter().javaClass
+        )
+        http?.addFilterBefore(
+            JWTAuthenticationFilter(jwtUtil = jwtUtil),
+            UsernamePasswordAuthenticationFilter().javaClass
+        )
+        http?.sessionManagement()?.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
 
     @Bean
